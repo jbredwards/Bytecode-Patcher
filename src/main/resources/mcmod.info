@@ -1,0 +1,11 @@
+[
+{
+  "modid": "bpatcher",
+  "name": "Bytecode Patcher",
+  "description": "A Minecraft Forge library that aims to be a more stable and user friendly alternative to Mixin.",
+  "version": "${version}",
+  "mcversion": "1.12.2",
+  "url": "https://github.com/jbredwards/Bytecode-Patcher",
+  "authorList": ["jbredwards"]
+}
+]
