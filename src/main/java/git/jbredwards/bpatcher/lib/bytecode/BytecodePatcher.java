@@ -1,4 +1,4 @@
-package git.jbredwards.bpatcher.api.bytecode;
+package git.jbredwards.bpatcher.lib.bytecode;
 
 /**
  *

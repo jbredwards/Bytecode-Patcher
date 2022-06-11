@@ -1,4 +1,4 @@
-package git.jbredwards.bpatcher.api.bytecode;
+package git.jbredwards.bpatcher.lib.debugging;
 
 /**
  * This is usually reserved for debugging, and isn't recommended for use outside development.

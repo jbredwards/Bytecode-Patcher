@@ -1,4 +1,4 @@
-package git.jbredwards.bpatcher.api.forge;
+package git.jbredwards.bpatcher.lib.forge;
 
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
