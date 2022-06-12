@@ -1,4 +1,4 @@
-package git.jbredwards.bpatcher.lib.debugging;
+package git.jbredwards.bpatcher.api.debugging;
 
 /**
  * This is usually reserved for debugging, and isn't recommended for use outside development.
@@ -8,13 +8,25 @@ package git.jbredwards.bpatcher.lib.debugging;
 public interface DebugOutputType
 {
     /**
+     * Does nothing.
+     */
+    byte NONE = 0;
+
+    /**
      * Creates a class file.
      */
     byte CLASS_FILE = 1;
+
     /**
-     * Creates an asmified text file.
+     * Creates a text file containing the class's bytecode.
      */
-    byte ASMIFIED_TXT = 2;
+    byte BYTECODE_TXT = 2;
+
+    /**
+     * Creates a text file containing the class's asmified bytecode.
+     */
+    byte ASMIFIED_TXT = 4;
+
     /**
      * Creates both a class file and an asmified text file.
      */
