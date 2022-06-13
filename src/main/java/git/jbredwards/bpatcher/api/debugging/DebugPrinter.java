@@ -18,11 +18,11 @@ import java.time.format.DateTimeFormatter;
 public final class DebugPrinter
 {
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void print(@Nonnull byte[] basicClass, @Nonnull String fileName, byte outputType) {
+    public static void print(@Nonnull byte[] basicClass, @Nonnull String pathName, @Nonnull String fileName, byte outputType) {
         if(outputType != DebugOutputType.NONE && !fileName.isEmpty()) {
             fileName = "bpatcher" + File.separatorChar +
-                    fileName.replace('.', File.separatorChar) + File.separatorChar +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"));
+                    pathName.replace('.', File.separatorChar) + File.separatorChar +
+                    fileName + '_' + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"));
             try {
                 //class
                 if((outputType & DebugOutputType.CLASS_FILE) != 0) {

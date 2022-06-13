@@ -19,7 +19,7 @@ public final class BytecodePatcher
     @Nonnull final byte[] basicClass;
     boolean optional;
 
-    @Nonnull String printedFileName = "";
+    @Nonnull String printedPathName = "";
     byte printBefore, printAfter;
 
     BytecodePatcher(@Nonnull byte[] basicClassIn, @Nonnull String patch, @Nonnull String... fallbacks) {
@@ -42,30 +42,42 @@ public final class BytecodePatcher
         return this;
     }
 
+    /**
+     * @param path usually transformedName (recommended)
+     * @param type see {@link git.jbredwards.bpatcher.api.debugging.DebugOutputType DebugOutputType}
+     */
     @Nonnull
-    public BytecodePatcher printBefore(@Nonnull String fileName, byte type) {
-        printedFileName = fileName;
+    public BytecodePatcher printBefore(@Nonnull String path, byte type) {
+        printedPathName = path;
         printBefore = type;
         return this;
     }
 
+    /**
+     * @param path usually transformedName (recommended)
+     * @param type see {@link git.jbredwards.bpatcher.api.debugging.DebugOutputType DebugOutputType}
+     */
     @Nonnull
-    public BytecodePatcher printAfter(@Nonnull String fileName, byte type) {
-        printedFileName = fileName;
+    public BytecodePatcher printAfter(@Nonnull String path, byte type) {
+        printedPathName = path;
         printAfter = type;
         return this;
     }
 
+    /**
+     * @param path usually transformedName (recommended)
+     * @param type see {@link git.jbredwards.bpatcher.api.debugging.DebugOutputType DebugOutputType}
+     */
     @Nonnull
-    public BytecodePatcher print(@Nonnull String fileName, byte type) {
-        printBefore(fileName, type);
-        printAfter(fileName, type);
+    public BytecodePatcher print(@Nonnull String path, byte type) {
+        printBefore(path, type);
+        printAfter(path, type);
         return this;
     }
 
     @Nonnull
     public byte[] apply() {
-        DebugPrinter.print(basicClass, printedFileName + "_before", printBefore);
+        DebugPrinter.print(basicClass, printedPathName, "before", printBefore);
         return apply_internal(0);
     }
 
@@ -80,7 +92,7 @@ public final class BytecodePatcher
             PATCHER.patch(basicClass, patch, output);
 
             final byte[] newClass = output.toByteArray();
-            DebugPrinter.print(newClass, printedFileName + "_after", printAfter);
+            DebugPrinter.print(newClass, printedPathName, "after", printAfter);
             return newClass;
         }
         catch(IOException e) {
