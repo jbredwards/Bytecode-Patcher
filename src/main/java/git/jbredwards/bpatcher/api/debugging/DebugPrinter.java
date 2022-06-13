@@ -17,16 +17,21 @@ import java.time.format.DateTimeFormatter;
  */
 public final class DebugPrinter
 {
+    /**
+     * Creates a file containing the provided bytecode, useful for debugging asm transformations in general.
+     * See {@link DebugOutputType} for file output types.
+     */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void print(@Nonnull byte[] basicClass, @Nonnull String pathName, @Nonnull String fileName, byte outputType) {
         if(outputType != DebugOutputType.NONE && !fileName.isEmpty()) {
-            fileName = "bpatcher" + File.separatorChar +
-                    pathName.replace('.', File.separatorChar) + File.separatorChar +
-                    fileName + '_' + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"));
+            final String className = pathName;
+            pathName = "bpatcher" + File.separatorChar + pathName.replace('.', File.separatorChar);
+            fileName += '_' + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"));
+
             try {
                 //class
                 if((outputType & DebugOutputType.CLASS_FILE) != 0) {
-                    final File file = new File(fileName + ".class");
+                    final File file = new File(pathName, fileName + ".class");
                     if(file.exists()) { file.delete(); }
 
                     final File dir = file.getParentFile();
@@ -38,7 +43,7 @@ public final class DebugPrinter
                 }
                 //bytecode
                 if((outputType & DebugOutputType.BYTECODE_TXT) != 0) {
-                    final File file = new File(fileName + "_bytecode.txt");
+                    final File file = new File(pathName, fileName + "_bytecode.txt");
                     if(file.exists()) { file.delete(); }
 
                     final File dir = file.getParentFile();
@@ -50,7 +55,7 @@ public final class DebugPrinter
                 }
                 //asm
                 if((outputType & DebugOutputType.ASMIFIED_TXT) != 0) {
-                    final File file = new File(fileName + "_asmified.txt");
+                    final File file = new File(pathName, fileName + "_asmified.txt");
                     if(file.exists()) { file.delete(); }
 
                     final File dir = file.getParentFile();
@@ -64,7 +69,7 @@ public final class DebugPrinter
             //oops
             catch(IOException e) {
                 e.printStackTrace();
-                System.err.println("Could not save file: " + fileName);
+                System.err.println("Could not save file: " + className);
             }
         }
     }
