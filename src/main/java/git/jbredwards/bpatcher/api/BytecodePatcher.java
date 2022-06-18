@@ -25,17 +25,13 @@ public final class BytecodePatcher
     static final int READER_FLAGS = RECALC_FRAMES ? ClassReader.SKIP_FRAMES : ClassReader.EXPAND_FRAMES;
 
     @Nonnull static final GDiffPatcher PATCHER = new GDiffPatcher();
-
-    @Nonnull final byte[] basicClass;
     @Nonnull final String[] patches;
 
     @Nonnull String printedPathName = "";
     byte printBefore, printAfter;
     boolean optional;
 
-    BytecodePatcher(@Nonnull byte[] basicClassIn, @Nonnull String patch, @Nonnull String[] fallbacks) {
-        basicClass = basicClassIn;
-
+    BytecodePatcher(@Nonnull String patch, @Nonnull String[] fallbacks) {
         patches = new String[fallbacks.length + 1];
         patches[0] = patch;
 
@@ -43,8 +39,8 @@ public final class BytecodePatcher
     }
 
     @Nonnull
-    public static BytecodePatcher of(@Nonnull byte[] basicClass, @Nonnull String patch, @Nonnull String... fallbacks) {
-        return new BytecodePatcher(basicClass, patch, fallbacks);
+    public static BytecodePatcher of(@Nonnull String patch, @Nonnull String... fallbacks) {
+        return new BytecodePatcher(patch, fallbacks);
     }
 
     /**
@@ -94,20 +90,20 @@ public final class BytecodePatcher
      * Applies the patches.
      */
     @Nonnull
-    public byte[] apply() {
+    public byte[] apply(@Nonnull byte[] basicClass) {
         DebugWriter.write(basicClass, printedPathName + "/before", printBefore);
-        return apply_internal(0);
+        return apply_internal(obfuscateBasicClass(basicClass), 0);
     }
 
     @Nonnull
-    byte[] apply_internal(int index) {
+    byte[] apply_internal(@Nonnull byte[] basicClass, int index) {
         final FileInputStream patchFile;
         try { patchFile = new FileInputStream(patches[index]); }
         catch(FileNotFoundException e) { throw new RuntimeException(e); }
 
         try {
             final ByteArrayOutputStream output = new ByteArrayOutputStream();
-            PATCHER.patch(obfuscateBasicClass(), patchFile, output);
+            PATCHER.patch(basicClass, patchFile, output);
             IOUtils.closeQuietly(patchFile);
 
             final byte[] newClass = deobfuscateIfNeeded(output.toByteArray());
@@ -117,7 +113,7 @@ public final class BytecodePatcher
         catch(IOException e) {
             IOUtils.closeQuietly(patchFile);
             //patch failed (likely due to a conflict), attempting fallback
-            if(++index < patches.length) return apply_internal(index);
+            if(++index < patches.length) return apply_internal(basicClass, index);
         }
 
         //this transformer is optional so don't crash
@@ -130,7 +126,7 @@ public final class BytecodePatcher
      * Obfuscates the basicClass bytes, this is done so the patch can be applied
      * (patches are always obfuscated, as to boost performance outside development).
      */
-    byte[] obfuscateBasicClass() {
+    byte[] obfuscateBasicClass(@Nonnull byte[] basicClass) {
         if(FMLLaunchHandler.isDeobfuscatedEnvironment()) {
             //TODO
         }
@@ -142,7 +138,7 @@ public final class BytecodePatcher
     /**
      * Deobfuscates the class if needed, this is done changes can be read while in a development environment.
      */
-    static byte[] deobfuscateIfNeeded(@Nonnull byte[] obfuscatedClass) {
+    byte[] deobfuscateIfNeeded(@Nonnull byte[] obfuscatedClass) {
         if(FMLLaunchHandler.isDeobfuscatedEnvironment()) {
             final ClassWriter writer = new ClassWriter(WRITER_FLAGS);
             new ClassReader(obfuscatedClass).accept(new FMLRemappingAdapter(writer), READER_FLAGS);
